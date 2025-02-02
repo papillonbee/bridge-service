@@ -1,0 +1,6 @@
+fastapi[standard]==0.113.0
+pydantic==2.8.0
+pydantic-settings==2.7.1
+requests==2.32.3
+jsons==1.6.3
+bridgepy==0.0.4
