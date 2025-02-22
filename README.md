@@ -26,7 +26,7 @@
         - Table name, same as your Google Sheets tab name
         - Application access key, go to your app in AppSheet > Settings > Integrations > Create Application Access Key
 2. `bridge-service` is also using [`bridgepy`](https://github.com/papillonbee/bridgepy) package which provides features like create game, join game, view game, bid, choose partner, trick, and delete game!
-    - `bridgepy==0.0.6` in requirements.txt
+    - `bridgepy==0.0.7` in requirements.txt
 
 **TLDR**, the main logic to play floating bridge resides in [`bridgepy`](https://github.com/papillonbee/bridgepy) which revolves around `game` object and [AppSheet](https://about.appsheet.com/home/) is picked as the choice for database to manage `game` data in a centralized location so all 4 players can see the current state and interact with the `game` from single source
 
@@ -36,8 +36,10 @@
 
 After `git clone` this project to your local, you can do below
 
-### Step 1: Create `.env` file with 3 environment variables
-These 3 are used for interacting with the [AppSheet API](https://support.google.com/appsheet/answer/10105398) to manage `game` data
+### Step 1: Create `.env` file with 4 environment variables
+The first 3 are used for interacting with the [AppSheet API](https://support.google.com/appsheet/answer/10105398) to manage `game` data
+
+The fourth variable is used for whitelisting request if request header `Origin` match with what's configured here
 
 Create it at project root directory
 
@@ -45,6 +47,7 @@ Create it at project root directory
 APP_SHEET_APP_ID=
 APP_SHEET_GAME_TABLE=
 APP_SHEET_APP_ACCESS_KEY=
+ALLOW_ORIGIN=
 ```
 
 ### Step 2: Run `bridge-service` container
@@ -80,7 +83,7 @@ Alternatively, you can also start your own project and pull `bridge-service` ima
 podman pull docker.io/ppllnb/bridge-service:latest
 ```
 
-### Step 2: Create `.env` file with 3 environment variables
+### Step 2: Create `.env` file with 4 environment variables
 From your project root directory, create `.env` file same as above
 
 ### Step 3: Create your `docker-compose.yml` file
