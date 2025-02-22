@@ -10,7 +10,9 @@ class SnakeCaseModel(BaseModel):
         from_attributes = True,
     )
 
-class Bid(Enum):
+class BidEnum(Enum):
+    PASS = "P"
+
     ONE_CLUB = "1C"
     ONE_DIAMOND = "1D"
     ONE_HEART = "1H"
@@ -53,7 +55,7 @@ class Bid(Enum):
     SEVEN_SPADE = "7S"
     SEVEN_NO_TRUMP = "7NT"
 
-class Card(Enum):
+class CardEnum(Enum):
     TWO_CLUB = "2C"
     THREE_CLUB = "3C"
     FOUR_CLUB = "4C"
@@ -112,11 +114,12 @@ class Card(Enum):
 
 class PlayerBid(SnakeCaseModel):
     player_id: str
-    bid: Bid | None
+    bid: BidEnum | None
 
 class PlayerTrick(SnakeCaseModel):
     player_id: str
-    trick: Card
+    trick: CardEnum
+    win: bool
 
 class PlayerScore(SnakeCaseModel):
     player_id: str

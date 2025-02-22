@@ -1,7 +1,6 @@
-from bridgepy.card import Card
 from pydantic import BaseModel
 
-from app.model import Bid, Card
+from app.model import BidEnum, CardEnum
 
 
 class BaseRequest(BaseModel):
@@ -21,13 +20,13 @@ class ViewRequest(GameRequest):
     pass
 
 class BidRequest(GameRequest):
-    bid: Bid | None = None
+    bid: BidEnum
 
 class PartnerRequest(GameRequest):
-    partner: Card
+    partner: CardEnum
 
 class TrickRequest(GameRequest):
-    trick: Card
+    trick: CardEnum
 
 class DeleteRequest(BaseRequest):
     gameId: str
