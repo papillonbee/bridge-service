@@ -39,7 +39,7 @@ After `git clone` this project to your local, you can do below
 ### Step 1: Create `.env` file with 4 environment variables
 The first 3 are used for interacting with the [AppSheet API](https://support.google.com/appsheet/answer/10105398) to manage `game` data
 
-The fourth variable is used for whitelisting request if request header `Origin` match with what's configured here
+The fourth variable is used for whitelisting REST API request if request header `Origin` match with what's configured here
 
 Create it at project root directory
 
@@ -47,7 +47,7 @@ Create it at project root directory
 APP_SHEET_APP_ID=
 APP_SHEET_GAME_TABLE=
 APP_SHEET_APP_ACCESS_KEY=
-ALLOW_ORIGIN=
+CORS_ALLOW_ORIGIN=
 ```
 
 ### Step 2: Run `bridge-service` container
