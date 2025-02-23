@@ -1,5 +1,5 @@
 # bridge-service
-`bridge-service` is a [FastAPI](https://fastapi.tiangolo.com/) app providing 7 API's for players to play floating bridge!
+`bridge-service` is a [FastAPI](https://fastapi.tiangolo.com/) app providing 7 REST API's and 1 WebSocket for players to play floating bridge!
 
 - `POST /game/create` Player can create a game
 - `POST /game/join` Player can join the game
@@ -13,6 +13,7 @@
 - `POST /game/partner` Player who won the bid can choose partner
 - `POST /game/trick` Player can trick
 - `POST /game/delete` Some upstream can delete the game after ended
+- `WebSocket /ws/${gameId}/${playerId}` Player can chat and listen to latest game state change
 
 ---
 
