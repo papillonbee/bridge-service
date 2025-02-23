@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     app_sheet_app_id: str
     app_sheet_game_table: str
     app_sheet_app_access_key: str
+    cors_allow_origin: str
 
     model_config = SettingsConfigDict(env_file = ".env")
 
