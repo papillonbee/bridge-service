@@ -29,3 +29,4 @@ class GamePlayerSnapshotResponse(SnakeCaseModel):
     partner: CardEnum | None
     tricks: list[GameTrick]
     scores: list[PlayerScore]
+    player_turn: str | None

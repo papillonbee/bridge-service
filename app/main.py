@@ -12,7 +12,6 @@ from fastapi.responses import JSONResponse
 from app.config import get_settings
 from app.dataconverter import get_bid_request_builder, get_game_snapshot_response_assembler
 from app.datastore import GameAppSheetDatastore
-from app.model import BidEnum
 from app.request import BidRequest, CreateRequest, DeleteRequest, JoinRequest, PartnerRequest, TrickRequest, ViewRequest
 from app.response import BaseResponse, GamePlayerSnapshotResponse, SuccessResponse
 from app.websocket import GameWebSocketManager
@@ -54,24 +53,18 @@ async def view_game(request: ViewRequest) -> BaseResponse[GamePlayerSnapshotResp
 async def bid(request: BidRequest) -> BaseResponse:
     bid: Bid = get_bid_request_builder().convert(request.bid)
     bridge_client.bid(PlayerId(request.playerId), GameId(request.gameId), bid)
-    message = f"{request.playerId} passes the bid" if bid is None else f"{request.playerId} bids {request.bid.value}"
-    await game_socket_manager.broadcast_message(message, request.gameId)
     await game_socket_manager.broadcast_game_snapshot(request.gameId)
     return SuccessResponse()
 
 @app.post("/game/partner", response_model_exclude_none = True)
 async def choose_partner(request: PartnerRequest) -> BaseResponse:
     bridge_client.choose_partner(PlayerId(request.playerId), GameId(request.gameId), Card.from_string(request.partner.value))
-    message = f"{request.playerId} chooses partner {request.partner.value}"
-    await game_socket_manager.broadcast_message(message, request.gameId)
     await game_socket_manager.broadcast_game_snapshot(request.gameId)
     return SuccessResponse()
 
 @app.post("/game/trick", response_model_exclude_none = True)
 async def trick(request: TrickRequest) -> BaseResponse:
     bridge_client.trick(PlayerId(request.playerId), GameId(request.gameId), Card.from_string(request.trick.value))
-    message = f"{request.playerId} plays {request.trick.value}"
-    await game_socket_manager.broadcast_message(message, request.gameId)
     await game_socket_manager.broadcast_game_snapshot(request.gameId)
     return SuccessResponse()
 
