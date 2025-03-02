@@ -53,6 +53,7 @@ class GameSnapshotResponseAssembler(DataConverter[GamePlayerSnapshot, GamePlayer
                     score = player_score.score
                 ) for player_score in game_player_snapshot.scores
             ],
+            player_turn = None if game_player_snapshot.player_turn is None else game_player_snapshot.player_turn.value,
         )
 
 class BidRequestBuilder(DataConverter[BidEnum, Bid]):
