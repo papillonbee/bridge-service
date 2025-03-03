@@ -1,8 +1,9 @@
 from bridgepy.bid import Bid
 from bridgepy.bridge import BridgeClient
 from bridgepy.card import Card
+from bridgepy.datastore import Datastore
 from bridgepy.exception import BizException
-from bridgepy.game import GameId
+from bridgepy.game import Game, GameId
 from bridgepy.player import PlayerId
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.exceptions import RequestValidationError
@@ -11,14 +12,18 @@ from fastapi.responses import JSONResponse
 
 from app.config import get_settings
 from app.dataconverter import get_bid_request_builder, get_game_snapshot_response_assembler
-from app.datastore import GameAppSheetDatastore
+from app.datastore import GameAppSheetDatastore, GameLocalDataStore
 from app.request import BidRequest, CreateRequest, DeleteRequest, JoinRequest, PartnerRequest, TrickRequest, ViewRequest
 from app.response import BaseResponse, GamePlayerSnapshotResponse, SuccessResponse
 from app.websocket import GameWebSocketManager
 
 
 settings = get_settings()
-game_datastore = GameAppSheetDatastore(settings.app_sheet_app_id, settings.app_sheet_game_table, settings.app_sheet_app_access_key)
+game_datastore: Datastore[GameId, Game] = GameAppSheetDatastore(
+    settings.app_sheet_app_id,
+    settings.app_sheet_game_table,
+    settings.app_sheet_app_access_key,
+) if settings.use_app_sheet else GameLocalDataStore()
 bridge_client = BridgeClient(game_datastore)
 game_socket_manager = GameWebSocketManager(bridge_client)
 

@@ -71,3 +71,38 @@ class GameAppSheetDatastore(Datastore[GameId, Game]):
         if type(body) is not list:
             return []
         return [jsons.load(jsons.loads(row["game"]), Game) for row in body]
+
+class GameLocalDataStore(Datastore[GameId, Game]):
+
+    def __init__(self) -> None:
+        self.games: list[Game] = []
+
+    def insert(self, game: Game) -> None:
+        i = self.__query_index(game.id)
+        if i is not None:
+            return
+        self.games.append(game)
+
+    def update(self, game: Game) -> None:
+        i = self.__query_index(game.id)
+        if i is None:
+            return
+        self.games = self.games[:i] + [game] + self.games[i+1:]
+
+    def delete(self, id: GameId) -> None:
+        i = self.__query_index(id)
+        if i is None:
+            return
+        self.games = self.games[:i] + self.games[i+1:]
+
+    def query(self, id: GameId) -> Game | None:
+        i = self.__query_index(id)
+        if i is None:
+            return None
+        return self.games[i]
+
+    def __query_index(self, id: GameId) -> int | None:
+        for i in range(len(self.games)):
+            if self.games[i].id == id:
+                return i
+        return None
