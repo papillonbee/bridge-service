@@ -3,6 +3,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    use_app_sheet: bool = True
     app_sheet_app_id: str
     app_sheet_game_table: str
     app_sheet_app_access_key: str
