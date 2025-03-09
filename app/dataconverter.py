@@ -43,8 +43,8 @@ class GameSnapshotResponseAssembler(DataConverter[GamePlayerSnapshot, GamePlayer
                         PlayerTrick(
                             player_id = player_trick.player_id.value,
                             trick = CardEnum(player_trick.trick.__repr__()),
-                            win = game_trick.trick_winner(game_player_snapshot.bid_winner.bid.suit) == player_trick.player_id
-                                if game_trick.ready_for_trick_winner() else False
+                            won = game_trick.trick_winner(game_player_snapshot.bid_winner.bid.suit) == player_trick.player_id
+                                if game_trick.ready_for_trick_winner() else False,
                         ) for player_trick in game_trick.player_tricks
                     ]
                 ) for game_trick in game_player_snapshot.tricks],

@@ -119,7 +119,7 @@ class PlayerBid(SnakeCaseModel):
 class PlayerTrick(SnakeCaseModel):
     player_id: str
     trick: CardEnum
-    win: bool
+    won: bool
 
 class PlayerScore(SnakeCaseModel):
     player_id: str
