@@ -58,9 +58,9 @@ class GameSnapshotResponseAssembler(DataConverter[GamePlayerSnapshot, GamePlayer
             player_turn = None if game_player_snapshot.player_turn is None else game_player_snapshot.player_turn.value,
         )
 
-class BidRequestBuilder(DataConverter[BidEnum, Bid]):
+class BidRequestBuilder(DataConverter[BidEnum, Bid | None]):
     
-    def convert(self, bid: BidEnum) -> Bid:
+    def convert(self, bid: BidEnum) -> Bid | None:
         return None if bid == BidEnum.PASS else Bid.from_string(bid.value)
 
 @lru_cache
@@ -68,5 +68,5 @@ def get_game_snapshot_response_assembler() -> DataConverter[GamePlayerSnapshot, 
     return GameSnapshotResponseAssembler()
 
 @lru_cache
-def get_bid_request_builder() -> DataConverter[BidEnum, Bid]:
+def get_bid_request_builder() -> DataConverter[BidEnum, Bid | None]:
     return BidRequestBuilder()

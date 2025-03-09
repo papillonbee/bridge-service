@@ -56,7 +56,7 @@ async def view_game(request: ViewRequest) -> BaseResponse[GamePlayerSnapshotResp
 
 @app.post("/game/bid", response_model_exclude_none = True)
 async def bid(request: BidRequest) -> BaseResponse:
-    bid: Bid = get_bid_request_builder().convert(request.bid)
+    bid: Bid | None = get_bid_request_builder().convert(request.bid)
     bridge_client.bid(PlayerId(request.playerId), GameId(request.gameId), bid)
     await game_socket_manager.broadcast_game_snapshot(request.gameId)
     return SuccessResponse()
