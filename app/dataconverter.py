@@ -36,29 +36,31 @@ class GameSnapshotResponseAssembler(DataConverter[GamePlayerSnapshot, GamePlayer
             bid_level = None if game_player_snapshot.bid_winner is None else game_player_snapshot.bid_winner.bid.level,
             trump_suit = None if game_player_snapshot.bid_winner is None else game_player_snapshot.bid_winner.bid.suit,
             partner = None if game_player_snapshot.partner is None else CardEnum(game_player_snapshot.partner.__repr__()),
+            partner_player_id = None if game_player_snapshot.partner_player_id is None else game_player_snapshot.partner_player_id.value,
             tricks = [
                 GameTrick(
                     player_tricks = [
                         PlayerTrick(
                             player_id = player_trick.player_id.value,
                             trick = CardEnum(player_trick.trick.__repr__()),
-                            win = game_trick.trick_winner(game_player_snapshot.bid_winner.bid.suit) == player_trick.player_id
-                                if game_trick.ready_for_trick_winner() else False
+                            won = game_trick.trick_winner(game_player_snapshot.bid_winner.bid.suit) == player_trick.player_id
+                                if game_trick.ready_for_trick_winner() else False,
                         ) for player_trick in game_trick.player_tricks
                     ]
                 ) for game_trick in game_player_snapshot.tricks],
             scores = [
                 PlayerScore(
                     player_id = player_score.player_id.value,
-                    score = player_score.score
+                    score = player_score.score,
+                    won = player_score.won,
                 ) for player_score in game_player_snapshot.scores
             ],
             player_turn = None if game_player_snapshot.player_turn is None else game_player_snapshot.player_turn.value,
         )
 
-class BidRequestBuilder(DataConverter[BidEnum, Bid]):
+class BidRequestBuilder(DataConverter[BidEnum, Bid | None]):
     
-    def convert(self, bid: BidEnum) -> Bid:
+    def convert(self, bid: BidEnum) -> Bid | None:
         return None if bid == BidEnum.PASS else Bid.from_string(bid.value)
 
 @lru_cache
@@ -66,5 +68,5 @@ def get_game_snapshot_response_assembler() -> DataConverter[GamePlayerSnapshot, 
     return GameSnapshotResponseAssembler()
 
 @lru_cache
-def get_bid_request_builder() -> DataConverter[BidEnum, Bid]:
+def get_bid_request_builder() -> DataConverter[BidEnum, Bid | None]:
     return BidRequestBuilder()

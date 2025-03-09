@@ -119,11 +119,12 @@ class PlayerBid(SnakeCaseModel):
 class PlayerTrick(SnakeCaseModel):
     player_id: str
     trick: CardEnum
-    win: bool
+    won: bool
 
 class PlayerScore(SnakeCaseModel):
     player_id: str
     score: int
+    won: bool
 
 class GameTrick(SnakeCaseModel):
     player_tricks: list[PlayerTrick]
