@@ -36,6 +36,7 @@ class GameSnapshotResponseAssembler(DataConverter[GamePlayerSnapshot, GamePlayer
             bid_level = None if game_player_snapshot.bid_winner is None else game_player_snapshot.bid_winner.bid.level,
             trump_suit = None if game_player_snapshot.bid_winner is None else game_player_snapshot.bid_winner.bid.suit,
             partner = None if game_player_snapshot.partner is None else CardEnum(game_player_snapshot.partner.__repr__()),
+            partner_player_id = None if game_player_snapshot.partner_player_id is None else game_player_snapshot.partner_player_id.value,
             tricks = [
                 GameTrick(
                     player_tricks = [
@@ -50,7 +51,8 @@ class GameSnapshotResponseAssembler(DataConverter[GamePlayerSnapshot, GamePlayer
             scores = [
                 PlayerScore(
                     player_id = player_score.player_id.value,
-                    score = player_score.score
+                    score = player_score.score,
+                    won = player_score.won,
                 ) for player_score in game_player_snapshot.scores
             ],
             player_turn = None if game_player_snapshot.player_turn is None else game_player_snapshot.player_turn.value,

@@ -27,7 +27,7 @@
         - Table name, same as your Google Sheets tab name
         - Application access key, go to your app in AppSheet > Settings > Integrations > Create Application Access Key
 2. `bridge-service` is also using [`bridgepy`](https://github.com/papillonbee/bridgepy) package which provides features like create game, join game, view game, bid, choose partner, trick, and delete game!
-    - `bridgepy==0.0.9` in requirements.txt
+    - `bridgepy==0.0.10` in requirements.txt
 
 **TLDR**, the main logic to play floating bridge resides in [`bridgepy`](https://github.com/papillonbee/bridgepy) which revolves around `game` object and [AppSheet](https://about.appsheet.com/home/) is picked as the choice for database to manage `game` data in a centralized location so all 4 players can see the current state and interact with the `game` from single source
 

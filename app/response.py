@@ -27,6 +27,7 @@ class GamePlayerSnapshotResponse(SnakeCaseModel):
     bid_level: int | None
     trump_suit: Suit | None
     partner: CardEnum | None
+    partner_player_id: str | None
     tricks: list[GameTrick]
     scores: list[PlayerScore]
     player_turn: str | None
