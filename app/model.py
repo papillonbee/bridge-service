@@ -125,6 +125,7 @@ class PlayerScore(SnakeCaseModel):
     player_id: str
     score: int
     won: bool
+    voted: bool
 
 class GameTrick(SnakeCaseModel):
     player_tricks: list[PlayerTrick]

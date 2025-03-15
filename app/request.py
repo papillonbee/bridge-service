@@ -28,5 +28,8 @@ class PartnerRequest(GameRequest):
 class TrickRequest(GameRequest):
     trick: CardEnum
 
+class ResetRequest(GameRequest):
+    pass
+
 class DeleteRequest(BaseRequest):
     gameId: str

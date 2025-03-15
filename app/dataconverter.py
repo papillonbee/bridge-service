@@ -22,7 +22,7 @@ class GameSnapshotResponseAssembler(DataConverter[GamePlayerSnapshot, GamePlayer
         return GamePlayerSnapshotResponse(
             game_id = game_player_snapshot.game_id.value,
             player_id = game_player_snapshot.player_id.value,
-            player_action = game_player_snapshot.player_action,
+            player_actions = game_player_snapshot.player_actions,
             player_hand = [
                 CardEnum(card.__repr__()) for card in game_player_snapshot.player_hand.cards
             ],
@@ -53,6 +53,7 @@ class GameSnapshotResponseAssembler(DataConverter[GamePlayerSnapshot, GamePlayer
                     player_id = player_score.player_id.value,
                     score = player_score.score,
                     won = player_score.won,
+                    voted = player_score.voted,
                 ) for player_score in game_player_snapshot.scores
             ],
             player_turn = None if game_player_snapshot.player_turn is None else game_player_snapshot.player_turn.value,

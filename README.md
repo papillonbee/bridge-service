@@ -1,5 +1,5 @@
 # bridge-service
-`bridge-service` is a [FastAPI](https://fastapi.tiangolo.com/) app providing 7 REST API's and 1 WebSocket for players to play floating bridge!
+`bridge-service` is a [FastAPI](https://fastapi.tiangolo.com/) app providing 8 REST API's and 1 WebSocket for players to play floating bridge!
 
 - `POST /game/create` Player can create a game
 - `POST /game/join` Player can join the game
@@ -9,9 +9,11 @@
     - my bid turn?
     - my turn to choose partner?
     - my turn to trick?
+    - can reset game?
 - `POST /game/bid` Player can bid
 - `POST /game/partner` Player who won the bid can choose partner
 - `POST /game/trick` Player can trick
+- `POST /game/reset` Player can reset game if game already concluded
 - `POST /game/delete` Some upstream can delete the game after ended
 - `WebSocket /ws/${gameId}/${playerId}` Player can chat and listen to latest game state change
 
@@ -27,7 +29,7 @@
         - Table name, same as your Google Sheets tab name
         - Application access key, go to your app in AppSheet > Settings > Integrations > Create Application Access Key
 2. `bridge-service` is also using [`bridgepy`](https://github.com/papillonbee/bridgepy) package which provides features like create game, join game, view game, bid, choose partner, trick, and delete game!
-    - `bridgepy==0.0.10` in requirements.txt
+    - `bridgepy==0.0.11` in requirements.txt
 
 **TLDR**, the main logic to play floating bridge resides in [`bridgepy`](https://github.com/papillonbee/bridgepy) which revolves around `game` object and [AppSheet](https://about.appsheet.com/home/) is picked as the choice for database to manage `game` data in a centralized location so all 4 players can see the current state and interact with the `game` from single source
 
@@ -78,16 +80,10 @@ podman-compose down
 ## Quick guide without cloning this project
 Alternatively, you can also start your own project and pull `bridge-service` image directly from [Docker Hub](https://www.docker.com/products/docker-hub/) because I've uploaded it!
 
-### Step 1: Pull latest `bridge-service` image from [Docker Hub](https://www.docker.com/products/docker-hub/)
-
-```shell
-podman pull docker.io/ppllnb/bridge-service:latest
-```
-
-### Step 2: Create `.env` file with 4 environment variables
+### Step 1: Create `.env` file with 4 environment variables
 From your project root directory, create `.env` file same as above
 
-### Step 3: Create your `docker-compose.yml` file
+### Step 2: Create your `docker-compose.yml` file
 From your project root directory
 ```yml
 version: "3.8"
@@ -103,13 +99,13 @@ services:
 
 ```
 
-### Step 4: Run your `bridge-service` container
+### Step 3: Run your `bridge-service` container
 From your project root directory
 ```shell
 podman-compose up --build -d
 ```
 
-### Step 5: Stop `bridge-service` container
+### Step 4: Stop `bridge-service` container
 From your project root directory
 ```shell
 podman-compose down
