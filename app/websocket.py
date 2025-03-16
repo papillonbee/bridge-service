@@ -5,6 +5,7 @@ from fastapi import WebSocket
 import logging
 
 from app.dataconverter import get_game_snapshot_response_assembler
+from app.message import Message, MessageType
 
 
 logging.basicConfig(
@@ -30,7 +31,12 @@ class GameWebSocketManager:
         self.active_connections.remove(websocket)
 
     async def send_personal_message(self, message: str, websocket: WebSocket):
-        await websocket.send_text(message)
+        msg: str = Message(message_type = MessageType.CHAT, message = message).model_dump_json(by_alias = True)
+        await websocket.send_text(msg)
+    
+    async def send_personal_ping(self, websocket: WebSocket):
+        msg: str = Message(message_type = MessageType.PING).model_dump_json(by_alias = True, exclude_none = True)
+        await websocket.send_text(msg)
 
     async def broadcast_message(self, message: str, game_id: str):
         for connection in self.active_connections:
@@ -40,7 +46,8 @@ class GameWebSocketManager:
                 continue
             if path_params.get("game_id") != game_id:
                 continue
-            await connection.send_text(message)
+            msg: str = Message(message_type = MessageType.CHAT, message = message).model_dump_json(by_alias = True)
+            await connection.send_text(msg)
     
     async def broadcast_game_snapshot(self, game_id: str):
         if len(self.active_connections) == 0:
@@ -55,4 +62,6 @@ class GameWebSocketManager:
                 continue
             player_id = path_params.get("player_id")
             game_snapshot: GamePlayerSnapshot = game.player_snapshot(PlayerId(player_id))
-            await connection.send_text(get_game_snapshot_response_assembler().convert(game_snapshot).model_dump_json(by_alias = True))
+            message: str = get_game_snapshot_response_assembler().convert(game_snapshot).model_dump_json(by_alias = True)
+            msg: str = Message(message_type = MessageType.GAME, message = message).model_dump_json(by_alias = True)
+            await connection.send_text(msg)

@@ -3,11 +3,12 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    use_app_sheet: bool = True
     app_sheet_app_id: str
     app_sheet_game_table: str
     app_sheet_app_access_key: str
-    cors_allow_origin: str
+    use_app_sheet: bool = True
+    cors_allow_origin: str = "*"
+    websocket_ping_interval: int = 20
 
     model_config = SettingsConfigDict(env_file = ".env")
 

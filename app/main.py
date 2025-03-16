@@ -1,3 +1,4 @@
+import asyncio
 from bridgepy.bid import Bid
 from bridgepy.bridge import BridgeClient
 from bridgepy.card import Card
@@ -9,10 +10,12 @@ from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.websockets import WebSocketState
 
 from app.config import get_settings
 from app.dataconverter import get_bid_request_builder, get_game_snapshot_response_assembler
 from app.datastore import GameAppSheetDatastore, GameLocalDataStore
+from app.message import Message, MessageType
 from app.request import BidRequest, CreateRequest, DeleteRequest, JoinRequest, PartnerRequest, ResetRequest, TrickRequest, ViewRequest
 from app.response import BaseResponse, GamePlayerSnapshotResponse, SuccessResponse
 from app.websocket import GameWebSocketManager
@@ -97,11 +100,40 @@ async def request_validation_exception_handler(request: Request, exc: RequestVal
 @app.websocket("/ws/{game_id}/{player_id}")
 async def websocket_endpoint(websocket: WebSocket, game_id: str, player_id: str):
     await game_socket_manager.connect(websocket)
+    last_pong_time = asyncio.get_event_loop().time()
+    ping_task = None
+
+    async def send_ping():
+        nonlocal last_pong_time
+        try:
+            while True:
+                await asyncio.sleep(get_settings().websocket_ping_interval)
+                await game_socket_manager.send_personal_ping(websocket)
+                if asyncio.get_event_loop().time() - last_pong_time > get_settings().websocket_ping_interval * 2:
+                    await websocket.close()
+                    break
+        except Exception:
+            pass
+
     try:
+        ping_task = asyncio.create_task(send_ping())
         await game_socket_manager.broadcast_message(f"{player_id} joins the chat", game_id)
         while True:
             text = await websocket.receive_text()
-            await game_socket_manager.broadcast_message(f"{player_id}: {text}", game_id)
-    except WebSocketDisconnect:
+            try:
+                msg = Message.model_validate_json(text)
+            except Exception:
+                continue
+            if msg.message_type == MessageType.CHAT:
+                await game_socket_manager.broadcast_message(f"{player_id}: {msg.message}", game_id)
+            if msg.message_type == MessageType.PONG:
+                last_pong_time = asyncio.get_event_loop().time()
+    finally:
         game_socket_manager.disconnect(websocket)
         await game_socket_manager.broadcast_message(f"{player_id} left the chat", game_id)
+        if ping_task is not None:
+            ping_task.cancel()
+            try:
+                await ping_task
+            except asyncio.CancelledError:
+                pass

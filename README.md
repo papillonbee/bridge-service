@@ -39,10 +39,14 @@
 
 After `git clone` this project to your local, you can do below
 
-### Step 1: Create `.env` file with 4 environment variables
-The first 3 are used for interacting with the [AppSheet API](https://support.google.com/appsheet/answer/10105398) to manage `game` data
+### Step 1: Create `.env` file with 6 environment variables
+`APP_SHEET_APP_ID`, `APP_SHEET_GAME_TABLE`, and `APP_SHEET_APP_ACCESS_KEY` are used for interacting with the [AppSheet API](https://support.google.com/appsheet/answer/10105398) to manage `game` data
 
-The fourth variable is used for whitelisting REST API request if request header `Origin` match with what's configured here
+`USE_APP_SHEET` is used to enable/disable AppSheet API integration. Defaults to true. if put as false, will store `game` data in memory instead of Google Sheets
+
+`CORS_ALLOW_ORIGIN` is used for whitelisting REST API request if request header `Origin` match with what's configured here. Defaults to `*` which means all origins are allowed
+
+`WEBSOCKET_PING_INTERVAL` is used for WebSocket ping interval in seconds. Defaults to 20 seconds
 
 Create it at project root directory
 
@@ -50,7 +54,9 @@ Create it at project root directory
 APP_SHEET_APP_ID=
 APP_SHEET_GAME_TABLE=
 APP_SHEET_APP_ACCESS_KEY=
-CORS_ALLOW_ORIGIN=
+USE_APP_SHEET=true
+CORS_ALLOW_ORIGIN=*
+WEBSOCKET_PING_INTERVAL=20
 ```
 
 ### Step 2: Run `bridge-service` container
@@ -80,7 +86,7 @@ podman-compose down
 ## Quick guide without cloning this project
 Alternatively, you can also start your own project and pull `bridge-service` image directly from [Docker Hub](https://www.docker.com/products/docker-hub/) because I've uploaded it!
 
-### Step 1: Create `.env` file with 4 environment variables
+### Step 1: Create `.env` file with 6 environment variables
 From your project root directory, create `.env` file same as above
 
 ### Step 2: Create your `docker-compose.yml` file
