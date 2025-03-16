@@ -14,35 +14,35 @@ class GameAppSheetDatastore(Datastore[GameId, Game]):
         self.headers = {"applicationAccessKey": app_access_key}
         self.properties = {"Timezone": "Asia/Singapore"}
 
-    def insert(self, game: Game) -> None:
+    def insert(self, entity: Game) -> None:
         data = {
             "Action": "Add",
             "Properties": self.properties,
             "Rows": [
                 {
-                    "id": game.id.value,
-                    "game": jsons.dumps(asdict(game)),
+                    "id": entity.id.value,
+                    "game": jsons.dumps(asdict(entity)),
                 }
             ]
         }
         response: Response = requests.post(self.url, headers = self.headers, json = data)
         if not response.ok:
-            raise BizException(20001, f"insert game id: {game.id.value} failed with response: {response}")
+            raise BizException(20001, f"insert game id: {entity.id.value} failed with response: {response}")
 
-    def update(self, game: Game) -> None:
+    def update(self, entity: Game) -> None:
         data = {
             "Action": "Edit",
             "Properties": self.properties,
             "Rows": [
                 {
-                    "id": game.id.value,
-                    "game": jsons.dumps(asdict(game)),
+                    "id": entity.id.value,
+                    "game": jsons.dumps(asdict(entity)),
                 }
             ]
         }
         response: Response = requests.post(self.url, headers = self.headers, json = data)
         if not response.ok:
-            raise BizException(20002, f"update game id: {game.id.value} failed with response: {response}")
+            raise BizException(20002, f"update game id: {entity.id.value} failed with response: {response}")
 
     def delete(self, id: GameId) -> None:
         data = {
@@ -75,34 +75,22 @@ class GameAppSheetDatastore(Datastore[GameId, Game]):
 class GameLocalDataStore(Datastore[GameId, Game]):
 
     def __init__(self) -> None:
-        self.games: list[Game] = []
+        self.games: dict[str, Game] = {}
 
-    def insert(self, game: Game) -> None:
-        i = self.__query_index(game.id)
-        if i is not None:
+    def insert(self, entity: Game) -> None:
+        if self.query(entity.id) is not None:
             return
-        self.games.append(game)
+        self.games.update({entity.id.value: entity})
 
-    def update(self, game: Game) -> None:
-        i = self.__query_index(game.id)
-        if i is None:
+    def update(self, entity: Game) -> None:
+        if self.query(entity.id) is None:
             return
-        self.games = self.games[:i] + [game] + self.games[i+1:]
+        self.games.update({entity.id.value: entity})
 
     def delete(self, id: GameId) -> None:
-        i = self.__query_index(id)
-        if i is None:
+        if self.query(id) is None:
             return
-        self.games = self.games[:i] + self.games[i+1:]
+        self.games.pop(id.value)
 
     def query(self, id: GameId) -> Game | None:
-        i = self.__query_index(id)
-        if i is None:
-            return None
-        return self.games[i]
-
-    def __query_index(self, id: GameId) -> int | None:
-        for i in range(len(self.games)):
-            if self.games[i].id == id:
-                return i
-        return None
+        return self.games.get(id.value)

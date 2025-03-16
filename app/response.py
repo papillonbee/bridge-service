@@ -20,7 +20,7 @@ class SuccessResponse(BaseResponse, Generic[T]):
 class GamePlayerSnapshotResponse(SnakeCaseModel):
     game_id: str
     player_id: str
-    player_action: PlayerAction | None
+    player_actions: list[PlayerAction]
     player_hand: list[CardEnum]
     bids: list[PlayerBid]
     bid_winner: str | None

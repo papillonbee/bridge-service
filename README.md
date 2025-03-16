@@ -1,5 +1,5 @@
 # bridge-service
-`bridge-service` is a [FastAPI](https://fastapi.tiangolo.com/) app providing 7 REST API's and 1 WebSocket for players to play floating bridge!
+`bridge-service` is a [FastAPI](https://fastapi.tiangolo.com/) app providing 8 REST API's and 1 WebSocket for players to play floating bridge!
 
 - `POST /game/create` Player can create a game
 - `POST /game/join` Player can join the game
@@ -9,9 +9,11 @@
     - my bid turn?
     - my turn to choose partner?
     - my turn to trick?
+    - can reset game?
 - `POST /game/bid` Player can bid
 - `POST /game/partner` Player who won the bid can choose partner
 - `POST /game/trick` Player can trick
+- `POST /game/reset` Player can reset game if game already concluded
 - `POST /game/delete` Some upstream can delete the game after ended
 - `WebSocket /ws/${gameId}/${playerId}` Player can chat and listen to latest game state change
 
@@ -27,7 +29,7 @@
         - Table name, same as your Google Sheets tab name
         - Application access key, go to your app in AppSheet > Settings > Integrations > Create Application Access Key
 2. `bridge-service` is also using [`bridgepy`](https://github.com/papillonbee/bridgepy) package which provides features like create game, join game, view game, bid, choose partner, trick, and delete game!
-    - `bridgepy==0.0.10` in requirements.txt
+    - `bridgepy==0.0.11` in requirements.txt
 
 **TLDR**, the main logic to play floating bridge resides in [`bridgepy`](https://github.com/papillonbee/bridgepy) which revolves around `game` object and [AppSheet](https://about.appsheet.com/home/) is picked as the choice for database to manage `game` data in a centralized location so all 4 players can see the current state and interact with the `game` from single source
 
@@ -37,10 +39,14 @@
 
 After `git clone` this project to your local, you can do below
 
-### Step 1: Create `.env` file with 4 environment variables
-The first 3 are used for interacting with the [AppSheet API](https://support.google.com/appsheet/answer/10105398) to manage `game` data
+### Step 1: Create `.env` file with 6 environment variables
+`APP_SHEET_APP_ID`, `APP_SHEET_GAME_TABLE`, and `APP_SHEET_APP_ACCESS_KEY` are used for interacting with the [AppSheet API](https://support.google.com/appsheet/answer/10105398) to manage `game` data
 
-The fourth variable is used for whitelisting REST API request if request header `Origin` match with what's configured here
+`USE_APP_SHEET` is used to enable/disable AppSheet API integration. Defaults to true. if put as false, will store `game` data in memory instead of Google Sheets
+
+`CORS_ALLOW_ORIGIN` is used for whitelisting REST API request if request header `Origin` match with what's configured here. Defaults to `*` which means all origins are allowed
+
+`WEBSOCKET_PING_INTERVAL` is used for WebSocket ping interval in seconds. Defaults to 20 seconds
 
 Create it at project root directory
 
@@ -48,7 +54,9 @@ Create it at project root directory
 APP_SHEET_APP_ID=
 APP_SHEET_GAME_TABLE=
 APP_SHEET_APP_ACCESS_KEY=
-CORS_ALLOW_ORIGIN=
+USE_APP_SHEET=true
+CORS_ALLOW_ORIGIN=*
+WEBSOCKET_PING_INTERVAL=20
 ```
 
 ### Step 2: Run `bridge-service` container
@@ -78,16 +86,10 @@ podman-compose down
 ## Quick guide without cloning this project
 Alternatively, you can also start your own project and pull `bridge-service` image directly from [Docker Hub](https://www.docker.com/products/docker-hub/) because I've uploaded it!
 
-### Step 1: Pull latest `bridge-service` image from [Docker Hub](https://www.docker.com/products/docker-hub/)
-
-```shell
-podman pull docker.io/ppllnb/bridge-service:latest
-```
-
-### Step 2: Create `.env` file with 4 environment variables
+### Step 1: Create `.env` file with 6 environment variables
 From your project root directory, create `.env` file same as above
 
-### Step 3: Create your `docker-compose.yml` file
+### Step 2: Create your `docker-compose.yml` file
 From your project root directory
 ```yml
 version: "3.8"
@@ -103,13 +105,13 @@ services:
 
 ```
 
-### Step 4: Run your `bridge-service` container
+### Step 3: Run your `bridge-service` container
 From your project root directory
 ```shell
 podman-compose up --build -d
 ```
 
-### Step 5: Stop `bridge-service` container
+### Step 4: Stop `bridge-service` container
 From your project root directory
 ```shell
 podman-compose down
