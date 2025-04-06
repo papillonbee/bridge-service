@@ -33,8 +33,8 @@ class GameSnapshotResponseAssembler(DataConverter[GamePlayerSnapshot, GamePlayer
                 ) for player_bid in data.bids
             ],
             bid_winner = None if data.bid_winner is None else data.bid_winner.player_id.value,
-            bid_level = None if data.bid_winner is None else data.bid_winner.bid.level,
-            trump_suit = None if data.bid_winner is None else data.bid_winner.bid.suit,
+            bid_level = None if data.bid_winner is None else data.bid_winner.require_bid().level,
+            trump_suit = None if data.bid_winner is None else data.bid_winner.require_bid().suit,
             partner = None if data.partner is None else CardEnum(data.partner.__repr__()),
             partner_player_id = None if data.partner_player_id is None else data.partner_player_id.value,
             tricks = [
@@ -43,7 +43,7 @@ class GameSnapshotResponseAssembler(DataConverter[GamePlayerSnapshot, GamePlayer
                         PlayerTrick(
                             player_id = player_trick.player_id.value,
                             trick = CardEnum(player_trick.trick.__repr__()),
-                            won = game_trick.trick_winner(data.bid_winner.bid.suit) == player_trick.player_id
+                            won = game_trick.trick_winner(data.require_bid_winner().require_bid().suit) == player_trick.player_id
                                 if game_trick.ready_for_trick_winner() else False,
                         ) for player_trick in game_trick.player_tricks
                     ]
