@@ -6,11 +6,10 @@ from bridgepy.datastore import Datastore
 from bridgepy.exception import BizException
 from bridgepy.game import Game, GameId
 from bridgepy.player import PlayerId
-from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Request, WebSocket
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from fastapi.websockets import WebSocketState
 
 from app.config import get_settings
 from app.dataconverter import get_bid_request_builder, get_game_snapshot_response_assembler
