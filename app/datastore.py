@@ -1,10 +1,12 @@
 from bridgepy.datastore import Datastore
 from bridgepy.exception import BizException
-from bridgepy.game import GameId, Game
+from bridgepy.game import Game, GameId
 from dataclasses import asdict
 import jsons
 import requests
 from requests import Response
+
+from app.entity import GamePlayerBot
 
 
 class GameAppSheetDatastore(Datastore[GameId, Game]):
@@ -94,3 +96,26 @@ class GameLocalDataStore(Datastore[GameId, Game]):
 
     def query(self, id: GameId) -> Game | None:
         return self.games.get(id.value)
+
+class GamePlayerBotLocalDataStore(Datastore[GameId, GamePlayerBot]):
+
+    def __init__(self) -> None:
+        self.game_player_bots: dict[str, GamePlayerBot] = {}
+
+    def insert(self, entity: GamePlayerBot) -> None:
+        if self.query(entity.id) is not None:
+            return
+        self.game_player_bots.update({entity.id.value: entity})
+
+    def update(self, entity: GamePlayerBot) -> None:
+        if self.query(entity.id) is None:
+            return
+        self.game_player_bots.update({entity.id.value: entity})
+
+    def delete(self, id: GameId) -> None:
+        if self.query(id) is None:
+            return
+        self.game_player_bots.pop(id.value)
+
+    def query(self, id: GameId) -> GamePlayerBot | None:
+        return self.game_player_bots.get(id.value)

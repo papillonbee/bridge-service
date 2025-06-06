@@ -38,27 +38,27 @@ class GameWebSocketManager:
         msg: str = Message(message_type = MessageType.PING).model_dump_json(by_alias = True, exclude_none = True)
         await websocket.send_text(msg)
 
-    async def broadcast_message(self, message: str, game_id: str):
+    async def broadcast_message(self, message: str, game_id: GameId):
         for connection in self.active_connections:
             path_params = connection.scope.get("path_params")
             if path_params is None:
                 logger.error(f"path_params not found in scope: {connection.scope}")
                 continue
-            if path_params.get("game_id") != game_id:
+            if path_params.get("game_id") != game_id.value:
                 continue
             msg: str = Message(message_type = MessageType.CHAT, message = message).model_dump_json(by_alias = True)
             await connection.send_text(msg)
     
-    async def broadcast_game_snapshot(self, game_id: str):
+    async def broadcast_game_snapshot(self, game_id: GameId):
         if len(self.active_connections) == 0:
             return
-        game: Game = self.bridge_client.find_game(GameId(game_id))
+        game: Game = self.bridge_client.find_game(game_id)
         for connection in self.active_connections:
             path_params = connection.scope.get("path_params")
             if path_params is None:
                 logger.error(f"path_params not found in scope: {connection.scope}")
                 continue
-            if path_params.get("game_id") != game_id:
+            if path_params.get("game_id") != game_id.value:
                 continue
             player_id = path_params.get("player_id")
             game_snapshot: GamePlayerSnapshot = game.player_snapshot(PlayerId(player_id))

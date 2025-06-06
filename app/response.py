@@ -31,3 +31,7 @@ class GamePlayerSnapshotResponse(SnakeCaseModel):
     tricks: list[GameTrick]
     scores: list[PlayerScore]
     player_turn: str | None
+
+class PlayerBotResponse(SnakeCaseModel):
+    player_id: str
+    bot: bool

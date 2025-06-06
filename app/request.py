@@ -33,3 +33,6 @@ class ResetRequest(GameRequest):
 
 class DeleteRequest(BaseRequest):
     gameId: str
+
+class ToggleBotRequest(GameRequest):
+    toggle: bool | None

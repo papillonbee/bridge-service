@@ -4,8 +4,9 @@ from typing import Generic, TypeVar
 from bridgepy.bid import Bid
 from bridgepy.game import GamePlayerSnapshot
 
+from app.entity import PlayerBot
 from app.model import BidEnum, CardEnum, GameTrick, PlayerBid, PlayerScore, PlayerTrick
-from app.response import GamePlayerSnapshotResponse
+from app.response import GamePlayerSnapshotResponse, PlayerBotResponse
 
 T = TypeVar("T")
 R = TypeVar("R")
@@ -58,6 +59,13 @@ class GameSnapshotResponseAssembler(DataConverter[GamePlayerSnapshot, GamePlayer
             ],
             player_turn = None if data.player_turn is None else data.player_turn.value,
         )
+    
+class PlayerBotResponseAssembler(DataConverter[PlayerBot, PlayerBotResponse]):
+    def convert(self, data: PlayerBot) -> PlayerBotResponse:
+        return PlayerBotResponse(
+            player_id = data.player_id.value,
+            bot = data.bot,
+        )
 
 class BidRequestBuilder(DataConverter[BidEnum, Bid | None]):
     
@@ -67,6 +75,10 @@ class BidRequestBuilder(DataConverter[BidEnum, Bid | None]):
 @lru_cache
 def get_game_snapshot_response_assembler() -> DataConverter[GamePlayerSnapshot, GamePlayerSnapshotResponse]:
     return GameSnapshotResponseAssembler()
+
+@lru_cache
+def get_player_bot_response_assembler() -> DataConverter[PlayerBot, PlayerBotResponse]:
+    return PlayerBotResponseAssembler()
 
 @lru_cache
 def get_bid_request_builder() -> DataConverter[BidEnum, Bid | None]:
